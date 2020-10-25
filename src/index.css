@@ -17,3 +17,8 @@ code {
 textarea {
     resize: none;
 }
+
+.go-back > a {
+    color: white;
+    text-decoration: none;
+}

@@ -1,52 +1,75 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import Form from './components/Form';
 import Result from './components/Result';
-import './App.css';
 
-class App extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            name: '',
-            birthday: '',
-            gender: '',
-            describe: '',
-            role: '',
-            showResult: false,
-        };
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
 
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-    }
+let isSubmit = false;
 
-    handleChange(e) {
-        const target = e.target;
-        const value = target.value;
-        const name = target.name;
-        this.setState({
-            [name]: value
-        });
-    }
-
-    handleSubmit(e) {
-        e.preventDefault();
-        localStorage.setItem('infor', this.state);
-        this.setState({
-            showResult: 'true',
-        });
-    }
-
-    render() {
-        return (
-            <div className="container w-50">
-                <Form
-                    handleChange={this.handleChange}
-                    handleSubmit={this.handleSubmit}>
-                </Form>
-                <Result data={this.state}></Result>
-            </div>
-        );
-    }
+function PrivateRoute({ children }) {
+    return (
+        <Route
+            render={() =>
+                isSubmit ? (
+                children
+                ) : (
+                    <Redirect to={'/'} />
+                )
+            }
+        />
+    );
 }
 
-export default App;
+export default function App() {
+    const [user, setUser] = useState({
+        name: '',
+        birthday: '',
+        gender: '',
+        describe: '',
+        role: '',
+    });
+
+    const [showResult, setShowResult] = useState(false);
+
+    function handleChange(e) {
+        e.preventDefault();
+        let target = e.target,
+            name = target.name,
+            value = target.value;
+
+        setUser(Object.assign(user, {
+            [name]: value,
+        }));
+    }
+
+    function handleSubmit(e) {
+        isSubmit = true;
+        setShowResult(true);
+    }
+
+    return (
+        <Router>
+            <div className="container w-50">
+                <Switch>
+                    <PrivateRoute path="/result">
+                        <Result
+                            showResult={showResult}
+                            user={user}>
+                        </Result>
+                    </PrivateRoute>
+                    <Route exact path="/">
+                        <Form
+                            handleChange={(e) => handleChange(e)}
+                            handleSubmit={(e) => handleSubmit(e)}>
+                        </Form>
+                    </Route>
+                </Switch>
+            </div>
+        </Router>
+    );
+}
