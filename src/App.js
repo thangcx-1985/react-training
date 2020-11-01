@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Form from './components/Form';
 import Result from './components/Result';
-
+import List from './components/List';
+import { createStore } from 'redux';
+import mainReducer from './reducers'
 import {
   BrowserRouter as Router,
   Switch,
@@ -9,9 +11,11 @@ import {
   Redirect,
 } from "react-router-dom";
 
-let isSubmit = false;
+const store = createStore(mainReducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
 function PrivateRoute({ children }) {
+    let isSubmit = store.getState() !== undefined && 'isSubmit' in store.getState() ? store.getState().isSubmit : false;
+
     return (
         <Route
             render={() =>
@@ -26,46 +30,23 @@ function PrivateRoute({ children }) {
 }
 
 export default function App() {
-    const [user, setUser] = useState({
-        name: '',
-        birthday: '',
-        gender: '',
-        describe: '',
-        role: '',
-    });
-
-    const [showResult, setShowResult] = useState(false);
-
-    function handleChange(e) {
-        e.preventDefault();
-        let target = e.target,
-            name = target.name,
-            value = target.value;
-
-        setUser(Object.assign(user, {
-            [name]: value,
-        }));
-    }
-
-    function handleSubmit(e) {
-        isSubmit = true;
-        setShowResult(true);
-    }
-
     return (
         <Router>
             <div className="container w-50">
                 <Switch>
                     <PrivateRoute path="/result">
                         <Result
-                            showResult={showResult}
-                            user={user}>
+                            store={store}>
                         </Result>
                     </PrivateRoute>
+                    <Route exact path="/list">
+                        <List
+                            store={store}>
+                        </List>
+                    </Route>
                     <Route exact path="/">
                         <Form
-                            handleChange={(e) => handleChange(e)}
-                            handleSubmit={(e) => handleSubmit(e)}>
+                            store={store}>
                         </Form>
                     </Route>
                 </Switch>

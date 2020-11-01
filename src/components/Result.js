@@ -1,23 +1,20 @@
 import React from "react";
-import {  useHistory } from "react-router-dom";
 import { Link } from "react-router-dom";
+import ListGroup from './ListGroup';
+
 function Result(props) {
-    let history = useHistory();
+    let store = props.store,
+        user;
+
+    if (store.getState() !== undefined && 'arrInfor' in store.getState()) {
+        user = store.getState().arrInfor[0];
+    }
 
     return (
-        props.showResult &&
         <div className="mt-4">
-            Name: <label>{props.user.name}</label>
-            <br/>
-            Birthday: <label>{props.user.birthday}</label>
-            <br/>
-            Gender: <label className="text-capitalize">{props.user.gender}</label>
-            <br/>
-            Describe: <label>{props.user.describe}</label>
-            <br/>
-            Role: <label className="text-capitalize">{props.user.role}</label>
-            <br/>
-            <button type="button" className="btn btn-primary mt-4 go-back" onClick={history.goBack()}><Link to="/">Go back</Link></button>
+            <ListGroup user={user} key=""></ListGroup>
+            <button type="button" className="btn btn-primary mt-4 go-back"><Link to="/">Go back</Link></button>
+            <button type="button" className="btn btn-primary mt-4 go-back ml-4"><Link to="/list">List user</Link></button>
         </div>
     );
 }
